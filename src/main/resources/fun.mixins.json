@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "me.blackout.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "FireChargeItemMixin",
+    "ItemFireChargeItemMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+	}
+}

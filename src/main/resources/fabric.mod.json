@@ -1,0 +1,36 @@
+{
+	"schemaVersion": 1,
+	"id": "fun",
+	"version": "0.1.1",
+	"name": "Fun",
+	"description": "A minecraft Fun mod",
+	"authors": [
+		"Blackoutxo"
+	],
+	"contact": {
+		"homepage": "Uh",
+		"sources": ""
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/fun/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"client": ["me.blackout.Fun"]
+	},
+	"mixins": [
+		"fun.mixins.json",
+		{
+			"config": "fun.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.18.2",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
