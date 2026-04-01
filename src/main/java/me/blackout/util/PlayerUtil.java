@@ -33,7 +33,7 @@ public class PlayerUtil {
         if ((z%1==0)&&(zla<0))z-=0.01;
 
         BlockPos ps = new BlockPos((int) x,(int) y,(int) z);
-        BlockState bl = MinecraftClient.getInstance().world.getBlockState(ps);
+//        BlockState bl = MinecraftClient.getInstance().world.getBlockState(ps);
 
         return ps;
     }
