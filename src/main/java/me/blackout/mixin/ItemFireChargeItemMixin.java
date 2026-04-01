@@ -1,49 +1,69 @@
 package me.blackout.mixin;
 
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.hurtingprojectile.LargeFireball;
-import net.minecraft.world.item.FireChargeItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.phys.Vec3;
-import org.spongepowered.asm.mixin.Final;
+import me.blackout.util.PlayerUtil;
+import me.blackout.util.StringSeperator;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.FireballEntity;
+import net.minecraft.item.FireChargeItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.stat.Stats;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.logging.Logger;
+import static me.blackout.Fun.mc;
 
 @Mixin(Item.class)
 public class ItemFireChargeItemMixin {
 
     @Inject(at = @At("HEAD"), method = "use", cancellable = true)
-    public void use(Level world, Player user, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+    public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         if ((Object)this instanceof FireChargeItem) {
-            ItemStack itemStack = user.getItemInHand(hand);
-            world.playSound((Player) null, user.getX(), user.getY(), user.getZ(), SoundEvents.GHAST_SHOOT, SoundSource.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
-            if (!world.isClientSide()) {
+            ItemStack itemStack = user.getStackInHand(hand);
+            world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_GHAST_SHOOT, SoundCategory.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
 
-                //float vec3d = user.getPreciseBodyRotation(1.0F);
-                LargeFireball fireballEntity = new LargeFireball(EntityType.FIREBALL, world);
-                fireballEntity.shootFromRotation(user, user.getXRot(), user.getYRot(), 0.0F, 1.5F, 1.0F);
-                fireballEntity.setPos(user.getX(), user.getY(0.5) /*+ 0.5*/, user.getZ());
-                world.addFreshEntity(fireballEntity);
+            // Get Input for Explosions from chat
+            int explosion = 3;
+            String m = PlayerUtil.message == null ? "3" : PlayerUtil.message.toUpperCase();
+            if (StringSeperator.letters(m).equals("FIREBALLSET") && !m.isEmpty()) {
+                explosion = StringSeperator.numbers(m);
+                mc.player.sendMessage(Text.of("Boom " + explosion), true);
             }
-            user.awardStat(Stats.ITEM_USED.get((FireChargeItem) (Object) this));
-            if (!user.getAbilities().invulnerable) {
-                itemStack.shrink(1);
+
+            if (!world.isClient()) {
+
+                Vec3d vec3d = user.getRotationVec(1.0F);
+                FireballEntity fireballEntity = new FireballEntity(world, user, vec3d,explosion);
+
+                // Set position & velocity
+                fireballEntity.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 1.5F, 1.0F);
+                fireballEntity.setPosition(user.getX(), user.getBodyY(0.5)/*+ 0.5*/, user.getZ());
+
+                // Spawn the FIREBALL
+                world.spawnEntity(fireballEntity);
+
+                // Fix stats
+                user.incrementStat(Stats.USED.getOrCreateStat((FireChargeItem) (Object) this));
+                if (!user.getAbilities().creativeMode) {
+                    itemStack.decrement(1);
+                }
+                cir.setReturnValue(ActionResult.SUCCESS.withNewHandStack(itemStack));
+
+            } else {
+                cir.setReturnValue(ActionResult.CONSUME);
             }
-            cir.setReturnValue(InteractionResult.SUCCESS.heldItemTransformedTo(itemStack));
         }
     }
 }
+

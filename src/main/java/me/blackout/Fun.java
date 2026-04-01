@@ -1,19 +1,14 @@
 package me.blackout;
 
-import me.blackout.feature.BlockDownDissapear;
 import me.blackout.feature.Zeus;
-import me.blackout.util.KeyInput;
+import me.blackout.util.PlayerUtil;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.client.MinecraftClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static me.blackout.util.PlayerUtil.LookingAt;
-
 public class Fun implements ClientModInitializer {
-	public static Minecraft mc;
+	public static MinecraftClient mc;
 	public static final String FUN = "FUN";
 	public static final Logger LOGGER = LoggerFactory.getLogger(FUN);
 
@@ -26,20 +21,12 @@ public class Fun implements ClientModInitializer {
 	public void onInitializeClient() {
 
 		// Global client accessor
-		mc = Minecraft.getInstance();
+		mc = MinecraftClient.getInstance();
 
-		//Blocks below vanish
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
-			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-				// Block Dissapear
-				BlockDownDissapear.disappear(player);
+		// ZEUS!!!!
+		Zeus.strike();
 
-				// BEHOLD YE POWER OF THUNDER
-				if(KeyInput.zeusT) Zeus.strike();
-			}
-		});
-
-		// Register key inputs
-		KeyInput.register();
+		// check them messages
+		PlayerUtil.onMessageSent();
 	}
 }

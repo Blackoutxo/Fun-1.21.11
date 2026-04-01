@@ -4,7 +4,8 @@
 	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"FireChargeItemMixin",
-		"ItemFireChargeItemMixin"
+		"ItemFireChargeItemMixin",
+		"RailGunBowMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
