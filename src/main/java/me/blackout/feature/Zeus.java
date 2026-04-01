@@ -8,13 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.world.World;
-
-import java.util.Objects;
-
-import static me.blackout.Fun.mc;
 
 public class Zeus {
     public static void strike() {
@@ -40,7 +35,7 @@ public class Zeus {
                 // Update and set position
                 lightning.updatePosition(PlayerUtil.LookingAt().getX(), PlayerUtil.LookingAt().getY(), PlayerUtil.LookingAt().getZ());
                 lightning.setPos(PlayerUtil.LookingAt().getX(), PlayerUtil.LookingAt().getY(), PlayerUtil.LookingAt().getZ());
-                
+
                 // Spawn the entity with explosion
                 world.spawnEntity(lightning);
                 world.createExplosion(lightning, lightning.getX(), lightning.getY(), lightning.getZ(), 2, World.ExplosionSourceType.TNT);
